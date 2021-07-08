@@ -1,52 +1,62 @@
 function promisee(executor){
    var resolveData;
-   var rejectError;
+   var rejectData;
    var resolveCb;
    var rejectCb; 
+   var catchCb;
+   var catchError;
   
-   function resolve(data){
-       resolveData = data;
-       if(typeof resolveCb === 'function'){
-         resolveCb(data);
-       }     
-   }
-   function reject(error){
-       rejectError = error;
-       if(typeof resolveCb === 'function'){
-         resolveCb(error);
-       } 
-   }
-  
-
-   this.then = function(cb){
-     if(typeof resolveData !== 'undefined'){
-       cb(resolveData);
+  function resolve(data){
+       try{
+         resolveData = data;
+         if(typeof resolveCb === 'function'){
+           resolveCb(data);
+         }   
+       }
+     catch(e){
+       catchError = e;
      }
-     else{
-       resolveCb = cb;
+         
+   }
+   function reject(data){
+     try{  
+         rejectData = data;
+         if(typeof rejectCb === 'function'){
+           rejectCb(data);
+         }
      }
+     catch(e){
+       catchError = e;
+     }
+   }
+ 
+   this.then = function(_resolveCb, _rejectCb){
+     if(typeof resolveData !== 'undefined' && typeof _resolveCb === 'function'){
+       _resolveCb(resolveData);
+     }
+     if(typeof rejectData !== 'undefined' && typeof _rejectCb === 'function'){
+       _rejectCb(rejectData);
+     }
+     resolveCb = _resolveCb;
+     rejectCb = _rejectCb; 
      return this;
    };
     
-   this.catch = function(cb){
-     if(typeof rejectError !== 'undefined'){
-       cb(rejectError);
-     }
-     else{
-       rejectCb = cb;
+   this.catch = function(catchCb){
+     if(typeof catchError !== 'undefined'){
+       catchCb(catchError);
      }
      return this;
    };
-  
    executor(resolve, reject); 
 }
 
 const ps = new promisee((resolve,reject)=>{
   setTimeout(()=>{
     resolve('i m done');
-    reject('I am error');
   }, 1000);
 });
+
 ps.then((obj)=>{
   console.log(obj);
 }).catch((reason)=>{
@@ -63,13 +73,13 @@ promisee.reject = function(reason){
     _reject(reason);
   })
 };
-promise.all = function(parr){
+promisee.all = function(parr){
   var fullfilled =[];
   var reason; 
   const executor = (resolve, reject)=>{
     parr.forEach((ps, index)=>{
-      ps.then((val)=>{
-      fullfilled.push(val);
+      ps.then((val, i)=>{
+      fullfilled[i] = val;
       if (fulfilledPromises.length === promises.length) {
          return resolve(result);
       }
@@ -84,13 +94,10 @@ promise.all = function(parr){
 }
 
 promisee.resolve('I am resolved').then((obj)=>{console.log(obj);}).catch((reson)=>{console.log(reson);});
-promisee.reject('I am rejected').then((obj)=>{console.log(obj);}).catch((reson)=>{console.log(reson);});
+promisee.reject('I am rejected').then((obj)=>{console.log(obj);}, (obj)=>{console.log(obj);}).catch((reson)=>{console.log(reson);});
 
 
 
 
 
 console.log('end');
-
-
-
