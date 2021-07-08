@@ -1,31 +1,3 @@
-Skip welcome & menu and move to editor
- 
-Textarea editor mode
-JS Bin features
-Getting started
-Keyboard Shortcuts
-Exporting/importing gist
- 
-Pro features
-Private bins
-Dropbox backup
-Vanity URLs
-Upgrade to pro now
- 
-Blog
-The Return and The Refactor
-Help
-Transferring ownership of a bin
-* What to expect from a Pro subscription
- 
-Donate to JS Bin ❤
-Support JS Bin to keep the project open source & MIT for all
-Follow @js_bin on twitter
-By using JS Bin you agree to our legal terms
- 
-“Everyone should learn how to program a computer because it teaches you how to think” —
-Steve Jobs
-log
 function promisee(executor){
    var resolveData;
    var rejectData;
@@ -82,13 +54,13 @@ function promisee(executor){
    };
    executor(resolve, reject); 
 }
-​
+
 const ps = new promisee((resolve,reject)=>{
   setTimeout(()=>{
     reject('i m done');
   }, 1000);
 });
-​
+
 ps.then((obj)=>{
   console.log('res', obj);
   throw new Error()
@@ -98,13 +70,69 @@ ps.then((obj)=>{
 }).catch((reason)=>{
   console.log('I am failed error with below error', reason);
 })
-"bad things happened"
-"end"
-"a"
-"I am failed error with below error"
-[object Error] { ... }
-["a", "b", "c", "d"]
-Bin info
-just now
-DigitalOcean Managed MongoDB a fully managed DBaaS for modern apps. Try now with $100 credit.
-Ad by EthicalAds
+
+promisee.resolve = function(data){
+  return new promisee((_resolve, _reject)=>{
+    _resolve(data);
+  })
+};
+promisee.reject = function(reason){
+  return new promisee((_resolve, _reject)=>{
+    _reject(reason);
+  })
+};
+promisee.all = function(parr){
+  var fullfilled =[];
+  var reason; 
+  var count = 0;
+  const pp = new promisee((resolve, reject)=>{
+    parr.forEach((ps, index)=>{
+      ps.then((val)=>{
+        count++;
+        fullfilled[index] = val;
+        if (count === parr.length) {
+          resolve(fullfilled);
+        } 
+      },reject);   
+    });
+  });
+  return pp;
+}
+
+//promisee.resolve('I am resolved').then((obj)=>{console.log(obj);}).catch((reson)=>{console.error(reson);});
+//promisee.reject('I am rejected').then((obj)=>{console.log(obj);}, (obj)=>{console.log(obj);}).catch((reson)=>{console.error(reson);});
+
+// delay helper for creating promises that resolve after ms milliseconds
+function delay(ms, value) {
+  return new promisee((resolve, reject)=>{
+    setTimeout(resolve, ms, value)
+  })
+}
+
+var pss = delay(100, 'a');
+pss.then((val)=>{
+  console.log(val);
+})
+
+//resolved promises wait for one another but ensure order is kept
+promisee.all([
+  delay(100, 'a'),
+  delay(200, 'b'),
+  delay(50, 'c'),
+  delay(1000, 'd')
+])
+.then(console.log, console.error) // [ a, b, c, d ]
+
+// resolved promises wait for one another but ensure order is kept
+promisee.all([
+  delay(100, 'a'),
+  delay(200, 'b'),
+  promisee.reject('bad things happened'),
+  delay(50, 'c'),
+  delay(1000, 'd')
+])
+.then(console.log, console.error) // Error: bad things happened
+
+
+
+console.log('end');
