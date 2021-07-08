@@ -1,3 +1,31 @@
+Skip welcome & menu and move to editor
+ 
+Textarea editor mode
+JS Bin features
+Getting started
+Keyboard Shortcuts
+Exporting/importing gist
+ 
+Pro features
+Private bins
+Dropbox backup
+Vanity URLs
+Upgrade to pro now
+ 
+Blog
+The Return and The Refactor
+Help
+Transferring ownership of a bin
+* What to expect from a Pro subscription
+ 
+Donate to JS Bin ❤
+Support JS Bin to keep the project open source & MIT for all
+Follow @js_bin on twitter
+By using JS Bin you agree to our legal terms
+ 
+“Everyone should learn how to program a computer because it teaches you how to think” —
+Steve Jobs
+log
 function promisee(executor){
    var resolveData;
    var rejectData;
@@ -14,7 +42,9 @@ function promisee(executor){
          }   
        }
      catch(e){
+       catchCb(e);
        catchError = e;
+       
      }
          
    }
@@ -26,6 +56,7 @@ function promisee(executor){
          }
      }
      catch(e){
+       catchCb(e);
        catchError = e;
      }
    }
@@ -38,66 +69,42 @@ function promisee(executor){
        _rejectCb(rejectData);
      }
      resolveCb = _resolveCb;
-     rejectCb = _rejectCb; 
+     rejectCb = _rejectCb;
      return this;
    };
     
-   this.catch = function(catchCb){
-     if(typeof catchError !== 'undefined'){
-       catchCb(catchError);
+   this.catch = function(_catchCb){
+     catchCb = _catchCb;
+     if(typeof catchError !== 'undefined' && typeof catchCb === 'function'){
+       _catchCb(catchError);
      }
      return this;
    };
    executor(resolve, reject); 
 }
-
+​
 const ps = new promisee((resolve,reject)=>{
   setTimeout(()=>{
-    resolve('i m done');
+    reject('i m done');
   }, 1000);
 });
-
+​
 ps.then((obj)=>{
-  console.log(obj);
+  console.log('res', obj);
+  throw new Error()
+},(obj)=>{
+  //console.log('rej', obj);
+  throw new Error('Whoops!');
 }).catch((reason)=>{
-  console.log('I am failed');
+  console.log('I am failed error with below error', reason);
 })
-
-promisee.resolve = function(data){
-  return new promisee((_resolve, _reject)=>{
-    _resolve(data);
-  })
-};
-promisee.reject = function(reason){
-  return new promisee((_resolve, _reject)=>{
-    _reject(reason);
-  })
-};
-promisee.all = function(parr){
-  var fullfilled =[];
-  var reason; 
-  const executor = (resolve, reject)=>{
-    parr.forEach((ps, index)=>{
-      ps.then((val, i)=>{
-      fullfilled[i] = val;
-      if (fulfilledPromises.length === promises.length) {
-         return resolve(result);
-      }
-      
-    }).catch((_reason)=>{
-        return reject(error);
-    });   
-    
-    });
-  }
-  return new promisee(executor)
-}
-
-promisee.resolve('I am resolved').then((obj)=>{console.log(obj);}).catch((reson)=>{console.log(reson);});
-promisee.reject('I am rejected').then((obj)=>{console.log(obj);}, (obj)=>{console.log(obj);}).catch((reson)=>{console.log(reson);});
-
-
-
-
-
-console.log('end');
+"bad things happened"
+"end"
+"a"
+"I am failed error with below error"
+[object Error] { ... }
+["a", "b", "c", "d"]
+Bin info
+just now
+DigitalOcean Managed MongoDB a fully managed DBaaS for modern apps. Try now with $100 credit.
+Ad by EthicalAds
