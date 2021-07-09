@@ -1,3 +1,4 @@
+// Refernce: https://blog.jakoblind.no/learn-react-redux-by-coding-the-connect-function-yourself/
 // var reducerRegistry = function(){
 //   var reducers = {}
 //   var emitChange = null;
