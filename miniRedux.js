@@ -17,7 +17,37 @@
 //   }
 // }
 
+//below line is just for under standing purpose.
 //var finalReducer = combineReducers(reducerRegistry.getgetReducers());
+
+
+// function connect(mapStateToProps, mapDispatchToProps){
+//   return function (WrappedComponent){ 
+//     return class extends React.Component{
+//       constructor(props){
+//         super(props);
+//         this.state = {};
+//         this.handleChange = this.handleChange.bind(this);
+//       }
+//       handleChange(){
+//         this.forceUpdate();
+//       }
+//       componentDidMount(){
+//         store.subscribe(this.handleChange);
+//       }
+//       componentWillUnmount(){
+//         store.unsubscribe();
+//       }
+//       render(){
+//         <WrappedComponent {...this.props} 
+//          {...mapStateToProps(store.getState(), this.props)}
+//           {...mapDispatchToProps(store.dispatch, this.props)}
+//         />
+//       }
+
+//     }
+//   }
+// }
 
 
 function createStore(reducer, initialState){ 
@@ -35,6 +65,9 @@ function createStore(reducer, initialState){
     },
     subscribe(newListener){
         listener = newListener;
+    },
+    unsubscribe(){
+        listener = null;
     }
   }
 }
