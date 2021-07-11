@@ -21,6 +21,20 @@
 //below line is just for under standing purpose.
 //var finalReducer = combineReducers(reducerRegistry.getgetReducers());
 
+// function combineReducers(reducers){
+//   var reducerKeys = Object.keys(reducers);
+//   return function(state={}, action){
+//     var nextState = {};
+//     for(var i = 0;i <reducerKeys.length; i++){
+//       var reducerKey = reducerKeys[i];
+//       var reducer = reducerKeys[reducerKey];
+//       var myState = state[reducerKey];
+//       nextState[reducerKey] = reducer(myState, action);
+//     }
+//     return nextState;
+//   }
+// }
+
 
 // function connect(mapStateToProps, mapDispatchToProps){
 //   return function (WrappedComponent){ 
