@@ -1,31 +1,32 @@
 function promisee(executor){
    var resolveData;
    var rejectData;
-   var resolveCb;
-   var rejectCb; 
+   var resolveCb = [];
+   var rejectCb = []; 
    var catchCb;
    var catchError;
+   var state = 'PENDING';
   
   function resolve(data){
        try{
+         state = 'FULFILLED';
          resolveData = data;
-         if(typeof resolveCb === 'function'){
-           resolveCb(data);
-         }   
-       }
+         resolveCb.forEach((resFn)=>{
+            resFn(data);
+         }); 
+     }
      catch(e){
        catchCb(e);
        catchError = e;
-       
-     }
-         
+     }    
    }
    function reject(data){
      try{  
+         state = 'REJECTED';
          rejectData = data;
-         if(typeof rejectCb === 'function'){
-           rejectCb(data);
-         }
+         rejectCb.forEach((rejFn)=>{
+            rejFn(data);
+         });
      }
      catch(e){
        catchCb(e);
@@ -34,15 +35,26 @@ function promisee(executor){
    }
  
    this.then = function(_resolveCb, _rejectCb){
-     if(typeof resolveData !== 'undefined' && typeof _resolveCb === 'function'){
-       _resolveCb(resolveData);
-     }
-     if(typeof rejectData !== 'undefined' && typeof _rejectCb === 'function'){
-       _rejectCb(rejectData);
-     }
-     resolveCb = _resolveCb;
-     rejectCb = _rejectCb;
-     return this;
+     return new promisee((res, rej)=>{
+        if(state === 'PENDING'){
+           if(typeof _resolveCb === 'function'){
+               resolveCb.push(_resolveCb);
+           }
+           if(typeof _rejectCb === 'function'){
+               rejectCb.push(_rejectCb);
+           }
+        }
+        else if (state === 'FULFILLED'){
+           resolveCb.forEach((resFn)=>{
+               resFn(resolveData);
+            });
+        }
+        else if (state === 'REJECTED'){
+            rejectCb.forEach((rejFn)=>{
+               rejFn(rejectData);
+            });
+        }
+     });
    };
     
    this.catch = function(_catchCb){
